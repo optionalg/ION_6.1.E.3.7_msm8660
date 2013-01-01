@@ -1,0 +1,39 @@
+
+ui_print("_____________________________________________________________");
+ui_print("   _____   _____     _  __                               _  ");
+ui_print("  / ____| |_   _|   | |/ /                              | |  ");
+ui_print(" | |  __    | |     | ' /    ___   _ __   _ __     ___  | |  ");
+ui_print(" | | |_ |   | |     |  <    / _ \ | '__| | '_ \   / _ \ | |  ");
+ui_print(" | |__| |  _| |_    | . \  |  __/ | |    | | | | |  __/ | |  ");
+ui_print("  \_____| |_____|   |_|\_\  \___| |_|    |_| |_|  \___| |_|  ");
+ui_print("");
+ui_print("________________________ Version #4 _________________________");
+ui_print("");
+ui_print("                       ganeshbiyer@xda                       ");
+ui_print("_____________________________________________________________");
+
+show_progress(0.100000, 10);
+ui_print(" Mounting System");
+run_program("/sbin/busybox", "mount", "/system");
+
+ui_print(" Flashing the kernel");
+assert(package_extract_file("kernel.elf", "/tmp/kernel.elf"),
+show_progress(0.100000, 20);
+write_raw_image("/tmp/kernel.elf", "/dev/block/mmcblk0p3"),
+show_progress(0.100000, 75);
+delete("/tmp/kernel.elf"),
+ui_print(" Updating Modules ");
+show_progress(0.100000, 80);
+package_extract_dir("system", "/system");
+);
+
+show_progress(0.100000, 100);
+ui_print(" Unmounting System");
+unmount("/system");
+ui_print("");
+ui_print(" Kernel Installed");
+
+
+
+
+

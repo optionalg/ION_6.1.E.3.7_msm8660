@@ -1,0 +1,74 @@
+#!/bin/bash
+
+echo "set arch and cross-compiler"
+export TOPDIR=$(cd $(dirname "$0"); pwd)
+export MY_ARCH=arm
+export MY_CROSS_COMPILE=/media/Develop/Ion_Develop/Kernel/buildtools/arm-eabi-4.4.3/bin/arm-eabi-
+export MY_PRODUCT="aoba"
+export MY_DEFCONF=gbi_aoba_defconfig
+export MY_KERNEL_VERSION=3.0.8
+
+export KBUILD_BUILD_USER="GI"
+export LINUX_COMPILE_HOST="maya"
+
+echo "get into this directory"
+cd $TOPDIR
+
+echo  "go into kernel directory"
+cd kernel
+
+echo 3 > .version
+
+echo  "clean the build first"
+#ARCH=${MY_ARCH} CROSS_COMPILE=${MY_CROSS_COMPILE} make clean
+#ARCH=${MY_ARCH} CROSS_COMPILE=${MY_CROSS_COMPILE} make distclean
+
+echo  "get defconfig"
+ARCH=${MY_ARCH} CROSS_COMPILE=${MY_CROSS_COMPILE} make $MY_DEFCONF
+
+#read -p "change configurations if needed"
+#ARCH=${MY_ARCH} CROSS_COMPILE=${MY_CROSS_COMPILE} make menuconfig
+
+echo  "compile the kernel"
+ARCH=${MY_ARCH} CROSS_COMPILE=${MY_CROSS_COMPILE} make -j6
+
+echo  "pull out kernel into compiled directory"
+cd $TOPDIR
+cp ${TOPDIR}/kernel/arch/arm/boot/zImage ${TOPDIR}/compiled/.
+
+echo  "pull out kernel modules (if any)"
+cd $TOPDIR
+mkdir -p ${TOPDIR}/compiled/system/lib/modules
+cp ${TOPDIR}/kernel/*/*.ko ${TOPDIR}/compiled/system/lib/modules/.
+cp ${TOPDIR}/kernel/*/*/*.ko ${TOPDIR}/compiled/system/lib/modules/.
+cp ${TOPDIR}/kernel/*/*/*/*.ko ${TOPDIR}/compiled/system/lib/modules/.
+cp ${TOPDIR}/kernel/*/*/*/*/*.ko ${TOPDIR}/compiled/system/lib/modules/.
+cp ${TOPDIR}/kernel/*/*/*/*/*/*.ko ${TOPDIR}/compiled/system/lib/modules/.
+
+echo  "go to wlan vendor and compile it"
+cd ${TOPDIR}/vendor/broadcom/wlan/dhd/linux
+make LINUXDIR=${TOPDIR}/kernel LINUXVER=${MY_KERNEL_VERSION} ARCH=${MY_ARCH} CROSS_COMPILE=${MY_CROSS_COMPILE}
+cp ${TOPDIR}/vendor/broadcom/wlan/dhd/linux/dhd-android/bcm4330.ko ${TOPDIR}/compiled/system/lib/modules/.
+#cp ${TOPDIR}/vendor/broadcom/wlan/dhd/linux/dhd-android/bcm4330.ko.stripped ${TOPDIR}/compiled/system/lib/modules/.
+make clean
+cd $TOPDIR
+
+#Create kernel.elf
+
+export ELFPYDIR="/media/Develop/Ion_Develop/Kernel/buildtools"
+export RPMDIR="/media/Develop/Ion_Develop/Kernel/buildtools"
+export BUILDDIR="/media/Develop/Ion_Develop/Kernel/buildtools"
+export RAMDISKIMG="/media/Develop/Ion_Develop/Kernel/ramdisk"
+export ZIMAGE="/media/Develop/Ion_Develop/Kernel/ION_6.1.E.3.7_copy1/compiled"
+export OUTDIR="/media/Develop/Ion_Develop/Kernel/ION_6.1.E.3.7_copy1/compiled"
+export TODAYDATE=$(date +%d%m%Y)
+export VERSION=$(cat kernel/.version)
+export FLASHABLES="/media/Develop/Ion_Develop/Kernel/ION_6.1.E.3.7_copy1/flashables"
+
+rm -r $FLASHABLES/system
+rm -r $FLASHABLES/kernel.elf
+
+python $ELFPYDIR/mkelf.py -o $OUTDIR/GI_kernel-v$VERSION-$TODAYDATE.elf $ZIMAGE/zImage@0x40208000 $RAMDISKIMG/ramdisk.img@0x41500000,ramdisk $RPMDIR/RPM.bin@0x20000,rpm
+cp $OUTDIR/GI_kernel-v$VERSION-$TODAYDATE.elf $FLASHABLES/kernel.elf
+cp -rp $OUTDIR/system $FLASHABLES/system
+7z a $FLASHABLES/"GI_Kernel-v"$VERSION"_Cwm_"$TODAYDATE".zip" -r $FLASHABLES/system $FLASHABLES/META-INF $FLASHABLES/kernel.elf
