@@ -55,20 +55,17 @@ cd $TOPDIR
 
 #Create kernel.elf
 
-export ELFPYDIR="/media/Develop/Ion_Develop/Kernel/buildtools"
-export RPMDIR="/media/Develop/Ion_Develop/Kernel/buildtools"
 export BUILDDIR="/media/Develop/Ion_Develop/Kernel/buildtools"
 export RAMDISKIMG="/media/Develop/Ion_Develop/Kernel/ramdisk"
-export ZIMAGE="/media/Develop/Ion_Develop/Kernel/ION_6.1.E.3.7_copy1/compiled"
-export OUTDIR="/media/Develop/Ion_Develop/Kernel/ION_6.1.E.3.7_copy1/compiled"
+export OUTDIR=${TOPDIR}/compiled
 export TODAYDATE=$(date +%d%m%Y)
 export VERSION=$(cat kernel/.version)
-export FLASHABLES="/media/Develop/Ion_Develop/Kernel/ION_6.1.E.3.7_copy1/flashables"
+export FLASHABLES=${TOPDIR}/flashables
 
 rm -r $FLASHABLES/system
 rm -r $FLASHABLES/kernel.elf
 
-python $ELFPYDIR/mkelf.py -o $OUTDIR/GI_kernel-v$VERSION-$TODAYDATE.elf $ZIMAGE/zImage@0x40208000 $RAMDISKIMG/ramdisk.img@0x41500000,ramdisk $RPMDIR/RPM.bin@0x20000,rpm
+python $BUILDDIR/mkelf.py -o $OUTDIR/GI_kernel-v$VERSION-$TODAYDATE.elf $OUTDIR/zImage@0x40208000 $RAMDISKIMG/ramdisk.img@0x41500000,ramdisk $BUILDDIR/RPM.bin@0x20000,rpm
 cp $OUTDIR/GI_kernel-v$VERSION-$TODAYDATE.elf $FLASHABLES/kernel.elf
 cp -rp $OUTDIR/system $FLASHABLES/system
 7z a $FLASHABLES/"GI_Kernel-v"$VERSION"_Cwm_"$TODAYDATE".zip" -r $FLASHABLES/system $FLASHABLES/META-INF $FLASHABLES/kernel.elf
