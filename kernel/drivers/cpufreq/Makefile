@@ -20,6 +20,7 @@ obj-$(CONFIG_CPU_FREQ_GOV_LAGFREE)        += cpufreq_lagfree.o
 obj-$(CONFIG_CPU_FREQ_GOV_ONDEMANDX)      += cpufreq_ondemandx.o
 obj-$(CONFIG_CPU_FREQ_GOV_LIONHEART)      += cpufreq_lionheart.o
 obj-$(CONFIG_CPU_FREQ_GOV_INTERACTIVEX)   += cpufreq_interactivex.o
+obj-$(CONFIG_CPU_FREQ_GOV_SAKURACTIVE)    += cpufreq_sakuractive.o
 
 
 # CPUfreq cross-arch helpers
