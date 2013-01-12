@@ -3,7 +3,7 @@
 echo "set arch and cross-compiler"
 export TOPDIR=$(cd $(dirname "$0"); pwd)
 export MY_ARCH=arm
-export MY_CROSS_COMPILE=/media/Develop/Ion_Develop/Kernel/buildtools/arm-eabi-4.4.3/bin/arm-eabi-
+export MY_CROSS_COMPILE=/media/Develop/Ion_Develop/toolchains/arm-eabi-4.6/bin/arm-eabi-
 export MY_PRODUCT="aoba"
 export MY_DEFCONF=gbi_aoba_defconfig
 export MY_KERNEL_VERSION=3.0.8
@@ -17,7 +17,7 @@ cd $TOPDIR
 echo  "go into kernel directory"
 cd kernel
 
-echo 3 > .version
+echo 4 > .version
 
 echo  "clean the build first"
 #ARCH=${MY_ARCH} CROSS_COMPILE=${MY_CROSS_COMPILE} make clean
@@ -55,8 +55,8 @@ cd $TOPDIR
 
 #Create kernel.elf
 
-export BUILDDIR="/media/Develop/Ion_Develop/Kernel/buildtools"
-export RAMDISKIMG="/media/Develop/Ion_Develop/Kernel/ramdisk"
+export BUILDDIR="/media/Develop/Ion_Develop/ion_common"
+export RAMDISKIMG="/media/Develop/Ion_Develop/stock/ramdisk"
 export OUTDIR=${TOPDIR}/compiled
 export TODAYDATE=$(date +%d%m%Y)
 export VERSION=$(cat kernel/.version)
